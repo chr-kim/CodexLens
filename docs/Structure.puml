@@ -1,0 +1,37 @@
+@startuml
+class ReadingNote {
+  +id: Long
+  +originalText: String
+  +translatedText: String
+  +timestamp: Long
+  +memo: String
+  +tags: String
+}
+
+class ReadingNoteDao {
+  +insert(note: ReadingNote)
+  +delete(note: ReadingNote)
+  +getAll(): List<ReadingNote>
+}
+
+class AppDatabase {
+  +readingNoteDao(): ReadingNoteDao
+}
+
+class MainViewModel {
+  +notes: LiveData<List<ReadingNote>>
+  +addNote()
+  +removeNote()
+}
+
+class MainScreen {
+  +카메라 프리뷰
+  +노트 목록
+  +저장 UI
+}
+
+ReadingNoteDao --> ReadingNote : manages
+AppDatabase --> ReadingNoteDao : provides
+MainViewModel --> AppDatabase : uses
+MainScreen --> MainViewModel : observes
+@enduml

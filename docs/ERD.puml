@@ -1,0 +1,25 @@
+@startuml
+' ReadingNote 엔터티
+class ReadingNote {
+  +id: Long
+  +originalText: String
+  +translatedText: String
+  +timestamp: Long
+  +memo: String
+  +tags: String
+}
+
+' (확장) User, Tag 예시
+class User {
+  +userId: Long
+  +name: String
+}
+class Tag {
+  +tagId: Long
+  +name: String
+}
+
+' 관계 예시
+User "1" -- "0..*" ReadingNote : "has"
+ReadingNote "0..*" -- "0..*" Tag : "tagged"
+@enduml

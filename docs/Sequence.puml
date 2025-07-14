@@ -1,0 +1,10 @@
+@startuml
+User -> MainScreen: 앱 실행
+MainScreen -> CameraX: 카메라 프리뷰 시작
+MainScreen -> MLKit: 텍스트 인식 요청
+MLKit --> MainScreen: 인식 결과 반환
+User -> MainScreen: 텍스트 터치
+MainScreen -> MLKit: 번역 요청
+MLKit --> MainScreen: 번역 결과 반환
+MainScreen -> RoomDB: 노트 저장
+@enduml
