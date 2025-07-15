@@ -77,4 +77,17 @@ dependencies {
     ksp("androidx.room:room-compiler:$room_version") // KSP 사용 시
     // kapt("androidx.room:room-compiler:$room_version") // kapt 사용 시(구버전)
     testImplementation("androidx.room:room-testing:$room_version")
+    
+    //
+    implementation("com.google.mlkit:language-id:17.0.6")
+    // To recognize Latin script
+    implementation("com.google.mlkit:text-recognition:16.0.1")
+// To recognize Chinese script
+    implementation("com.google.mlkit:text-recognition-chinese:16.0.1")
+// To recognize Devanagari script
+    implementation("com.google.mlkit:text-recognition-devanagari:16.0.1")
+// To recognize Japanese script
+    implementation("com.google.mlkit:text-recognition-japanese:16.0.1")
+// To recognize Korean script
+    implementation("com.google.mlkit:text-recognition-korean:16.0.1")
 }
