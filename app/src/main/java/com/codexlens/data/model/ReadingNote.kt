@@ -2,8 +2,11 @@ package com.codexlens.data.model
 
 // ReadingNote.kt
 
+import androidx.room.Dao
 import androidx.room.Entity
+import androidx.room.Insert
 import androidx.room.PrimaryKey
+import androidx.room.Query
 
 /**
  * 독서 노트 데이터 클래스
@@ -19,3 +22,11 @@ data class ReadingNote(
     val translatedText: String,
     val timestamp: Long
 )
+
+@Dao
+interface ReadingNoteDao {
+    @Insert
+    suspend fun insert(note: ReadingNote): Long
+    @Query("SELECT * FROM reading_notes ORDER BY timestamp DESC")
+    suspend fun getAllNotes(): List<ReadingNote>
+}

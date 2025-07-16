@@ -90,4 +90,9 @@ dependencies {
     implementation("com.google.mlkit:text-recognition-japanese:16.0.1")
 // To recognize Korean script
     implementation("com.google.mlkit:text-recognition-korean:16.0.1")
+    
+    implementation("com.google.mlkit:translate:17.0.3") // 최신 버전 확인 필요
+    
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
+    
 }
