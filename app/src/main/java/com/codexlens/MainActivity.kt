@@ -186,7 +186,9 @@ class MlkitTranslatorHelper(
     }
 }
 
-
+/**
+ * 앱 전체 UI 진입점: 권한 체크, 카메라·번역·노트 저장, 목록 출력 등 담당
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
@@ -328,15 +330,25 @@ fun MainScreen() {
             .padding(bottom = 24.dp),
         content = {
             items(noteList.value) { note ->
-                Card(modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 4.dp)
-                    .fillMaxWidth()
+                Card(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
-                        Text("원문: ${note.originalText}", style = MaterialTheme.typography.bodyMedium)
-                        Text("번역: ${note.translatedText}", style = MaterialTheme.typography.bodyMedium)
                         Text(
-                            "저장 시각: ${java.text.SimpleDateFormat("yy-MM-dd HH:mm").format(java.util.Date(note.timestamp))}",
+                            "원문: ${note.originalText}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            "번역: ${note.translatedText}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            "저장 시각: ${
+                                java.text.SimpleDateFormat("yy-MM-dd HH:mm")
+                                    .format(java.util.Date(note.timestamp))
+                            }",
                             style = MaterialTheme.typography.labelSmall, color = Color.Gray
                         )
                     }
@@ -551,7 +563,9 @@ fun transformBoundingBox(
 }
 
 /**
- * 카메라 권한 요청 처리 컴포저블
+ * 카메라 권한 요청 및 승인 핸들러
+ * @param onPermissionGranted 성공 콜백
+ * @param onPermissionDenied 실패 콜백
  */
 @Composable
 fun CameraPermissionHandler(
@@ -579,6 +593,11 @@ fun CameraPermissionHandler(
     }
 }
 
+/**
+ * 파일(저장소) 권한 요청 및 승인 핸들러
+ * @param onGranted 권한 승인 콜백
+ * @param onDenied 거부 콜백
+ */
 @Composable
 fun FilePermissionHandler(
     onGranted: () -> Unit,
@@ -667,7 +686,6 @@ fun saveToFile(context: Context, fileName: String, content: ByteArray) {
         resolver.openOutputStream(it)?.use { it.write(content) }
     }
 }
-
 
 
 //@Preview(showBackground = true)

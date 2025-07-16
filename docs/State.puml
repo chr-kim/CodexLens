@@ -1,0 +1,24 @@
+@startuml
+title Codex Lens - 번역 및 노트 저장 상태 다이어그램
+
+[*] --> Idle : 앱 진입/팝업 닫힘
+
+Idle --> Loading : 텍스트 박스 선택 및 번역 요청
+Loading --> Success : 번역 성공 콜백
+Loading --> Error : 번역 실패 콜백
+
+Success --> ShowingTranslation : 번역 결과 AlertDialog 표시
+Error --> ShowingTranslation : 에러 메시지 AlertDialog 표시
+
+ShowingTranslation --> Idle : 닫기 버튼 클릭, 팝업 닫기
+
+ShowingTranslation --> SavingNote : '노트 저장' 버튼 클릭
+SavingNote --> NotesLoaded : 노트 DB 저장 및 리스트 갱신 성공
+SavingNote --> ShowingTranslation : 노트 저장 실패(에러 안내 후 팝업 유지)
+
+NotesLoaded --> Idle : 목록 갱신 완료, 팝업 닫기 또는 UI 대기 상태
+
+' 노트 목록 별도 갱신 분기 (처음 진입/리스트 새로고침)
+Idle --> NotesLoaded : 노트 목록(전체) 최초 로딩
+
+@enduml

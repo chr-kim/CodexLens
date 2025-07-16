@@ -3,8 +3,16 @@ User -> MainScreen: 앱 실행
 MainScreen -> CameraX: 카메라 프리뷰 시작
 MainScreen -> MLKit: 텍스트 인식 요청
 MLKit --> MainScreen: 인식 결과 반환
-User -> MainScreen: 텍스트 터치
+User -> MainScreen: 인식된 텍스트(박스) 터치
 MainScreen -> MLKit: 번역 요청
 MLKit --> MainScreen: 번역 결과 반환
-MainScreen -> RoomDB: 노트 저장
+MainScreen -> AlertDialog: 번역 결과 팝업 표시
+User -> MainScreen: '노트 저장' 버튼 클릭
+MainScreen -> RoomDB: 노트(RoomDB) 저장
+RoomDB --> MainScreen: 저장 완료(성공/실패)
+MainScreen -> MainScreen: 저장/오류 안내 및 상태 UI 갱신
+User -> MainScreen: 아래로 스크롤 (or 화면 하단 확인)
+MainScreen -> RoomDB: 전체 노트 목록 SELECT
+RoomDB --> MainScreen: 노트 목록 반환
+MainScreen -> MainScreen: LazyColumn 으로 노트 리스트 표시
 @enduml
