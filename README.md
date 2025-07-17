@@ -14,6 +14,18 @@ Codex Lens는 카메라로 책/화면을 비추면 실시간으로 텍스트를 
 **본 파일/앱 자료는 리뷰를 위해 교육생 및 강사님들께만 공유합니다.
 외부 배포·2차 공유·상업적 전환은 자제해 주시고, 문의사항은 개발자에게 말씀해 주세요.**
 
+## 기술 스택 및 구조
+
+| 항목      | 사용 기술/라이브러리                  | 설명                                   |
+|---------| ------------------------------------- |--------------------------------------|
+| 언어/플랫폼  | Kotlin, Android                       | Jetpack Compose 기반 현대적 구현            |
+| UI      | Jetpack Compose                       | 단일 메인 스크린 내 OCR, 번역, 저장, 목록 UI 통합    |
+| ~~OCR~~ | ML Kit Text Recognition               | ~~실시간 텍스트 탐지~~(목업)                   |
+| 번역      | ML Kit Translation                    | 오프라인/온라인 번역 지원                       |
+| DB      | Room (SQLite)                         | 노트 정보(원문, 번역, 타임스탬프) 저장              |
+| 구조      | MVVM(Model-View-ViewModel) + Repository 패턴                | ViewModel/StateFlow 기반 상태 관리         |
+| 이미지/저장  | MediaStore, File API                  | 번역/노트 내보내기, 사용자 파일 접근                |
+| 아키텍처    | 단일/통합 MVP(단계적 화면 확장)        | 추후 CaptureScreen, ReadScreen으로 분할 가능 |
 
 ## 주요 기능
 
@@ -21,10 +33,7 @@ Codex Lens는 카메라로 책/화면을 비추면 실시간으로 텍스트를 
   카메라 화면에서 실시간으로 텍스트 블록들을 탐지, 박스로 표시(목업)  
   카메라 화면에서 바운딩박스와 텍스트 인식 결과가 약 0.3~0.5초마다 갱신되는 문제가 있어서,  
   바운딩 박스와 인식된 텍스트를 가상으로 구현하여 기능이 안정화되었을때를 묘사하였습니다.
-  | ![](images/appMain.png) | ![](images/translate.png) | ![](images/noteView.png) |
-|:--------------------:|:-------------------:|:-------------------:|
-| 메인 화면            | 번역 화면           | 노트 조회 화면      |
-
+  | ![메인 화면](images/appMain.png) | ![번역 화면](images/translate.png) | ![노트 조회 화면](images/noteView.png) |  
 
 - **터치 기반 번역 및 오버레이 표시**  
   텍스트 박스 터치 시 번역 요청, 팝업(오버레이)로 번역 결과를 즉시 확인  
@@ -38,19 +47,6 @@ Codex Lens는 카메라로 책/화면을 비추면 실시간으로 텍스트를 
 
 - **노트별 메모/태그 추가 (확장 예정)**  
   추가 설명, 키워드 태그 등 메모 기능(로드맵)
-
-## 기술 스택 및 구조
-
-| 항목      | 사용 기술/라이브러리                  | 설명                                   |
-|---------| ------------------------------------- |--------------------------------------|
-| 언어/플랫폼  | Kotlin, Android                       | Jetpack Compose 기반 현대적 구현            |
-| UI      | Jetpack Compose                       | 단일 메인 스크린 내 OCR, 번역, 저장, 목록 UI 통합    |
-| ~~OCR~~ | ML Kit Text Recognition               | ~~실시간 텍스트 탐지~~(목업)                   |
-| 번역      | ML Kit Translation                    | 오프라인/온라인 번역 지원                       |
-| DB      | Room (SQLite)                         | 노트 정보(원문, 번역, 타임스탬프) 저장              |
-| 구조      | MVVM(Model-View-ViewModel) + Repository 패턴                | ViewModel/StateFlow 기반 상태 관리         |
-| 이미지/저장  | MediaStore, File API                  | 번역/노트 내보내기, 사용자 파일 접근                |
-| 아키텍처    | 단일/통합 MVP(단계적 화면 확장)        | 추후 CaptureScreen, ReadScreen으로 분할 가능 |
 
 ## 프로젝트 구조 예시
 
