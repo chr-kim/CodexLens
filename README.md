@@ -44,7 +44,7 @@ Codex Lens는 카메라로 책/화면을 비추면 실시간으로 텍스트를 
 | ~~OCR~~ | ML Kit Text Recognition               | ~~실시간 텍스트 탐지~~(목업)                   |
 | 번역      | ML Kit Translation                    | 오프라인/온라인 번역 지원                       |
 | DB      | Room (SQLite)                         | 노트 정보(원문, 번역, 타임스탬프) 저장              |
-| 구조      | MVVM + Repository 패턴                | ViewModel/StateFlow 기반 상태 관리         |
+| 구조      | MVVM(Model-View-ViewModel) + Repository 패턴                | ViewModel/StateFlow 기반 상태 관리         |
 | 이미지/저장  | MediaStore, File API                  | 번역/노트 내보내기, 사용자 파일 접근                |
 | 아키텍처    | 단일/통합 MVP(단계적 화면 확장)        | 추후 CaptureScreen, ReadScreen으로 분할 가능 |
 
