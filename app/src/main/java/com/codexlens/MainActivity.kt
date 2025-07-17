@@ -1,5 +1,6 @@
 package com.codexlens
 
+import CodexLensViewModel
 import android.Manifest
 import android.content.ContentValues
 import android.graphics.Matrix
@@ -44,8 +45,10 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.MediaStore
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import com.codexlens.data.model.ReadingNote
@@ -195,9 +198,10 @@ fun MainScreen() {
     // --- 상태 변수 선언 ---
     var cameraPermissionGranted by remember { mutableStateOf(false) }
     var filePermissionGranted by remember { mutableStateOf(false) }
+    var showNoteList by remember { mutableStateOf(false) }
     val context = LocalContext.current
     
-    // --- 권한 상태 초기화 (앱 시작 시 현재 권한 상태 확인) ---
+    // --- 권한 상태 초기화 (앱 실행 시 현재 권한 상태 확인) ---
     LaunchedEffect(Unit) {
         cameraPermissionGranted = ContextCompat.checkSelfPermission(
             context,
@@ -217,49 +221,57 @@ fun MainScreen() {
         }
     }
     
-    // --- 데이터 및 ViewModel 관련 ---
+    // --- 데이터 및 ViewModel ---
     val database = remember { AppDatabase.getInstance(context) }
     val readingNoteDao = remember { database.readingNoteDao() }
     val viewModel: CodexLensViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
         factory = CodexLensViewModelFactory(context, readingNoteDao)
     )
     
-    // --- UI 상태 관련 ---
+    // --- 번역 모델 다운로드 준비 트리거 ---
+    LaunchedEffect(cameraPermissionGranted, filePermissionGranted) {
+        if (cameraPermissionGranted && filePermissionGranted) {
+            viewModel.prepareTranslator(context)
+        }
+    }
+    
     val translateState = viewModel.translateState.collectAsState()
     var selectedBox by remember { mutableStateOf<TextBox?>(null) }
     var showTranslation by remember { mutableStateOf(false) }
     
+    val noteList = viewModel.noteList.collectAsState()
+    
+    // --- 노트 최초 로딩 ---
+    LaunchedEffect(Unit) {
+        viewModel.loadAllNotes()
+    }
+    
     Scaffold(
         topBar = { CenterAlignedTopAppBar(title = { Text("Codex Lens") }) },
+        bottomBar = {
+            BottomAppBar {
+                Button(onClick = { showNoteList = !showNoteList }) {
+                    Text(if (showNoteList) "노트 목록 숨기기" else "노트 목록 보기")
+                }
+            }
+        },
         content = { innerPadding ->
             Surface(modifier = Modifier.padding(innerPadding)) {
-                // ★★★ 개선된 권한 체크 로직 ★★★
                 if (!cameraPermissionGranted) {
-                    // 1단계: 카메라 권한 요청
                     CameraPermissionHandler(
                         onPermissionGranted = { cameraPermissionGranted = true },
                         onPermissionDenied = {
-                            Toast.makeText(
-                                context,
-                                "카메라 권한이 필요합니다.",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Toast.makeText(context, "카메라 권한이 필요합니다.", Toast.LENGTH_LONG).show()
                         }
                     )
                 } else if (!filePermissionGranted) {
-                    // 2단계: 파일 권한 요청 (카메라 권한이 있을 때만)
                     FilePermissionHandler(
                         onGranted = { filePermissionGranted = true },
                         onDenied = {
-                            Toast.makeText(
-                                context,
-                                "파일(저장소) 권한이 필요합니다.",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Toast.makeText(context, "파일(저장소) 권한이 필요합니다.", Toast.LENGTH_LONG).show()
                         }
                     )
                 } else {
-                    // 3단계: 모든 권한이 있을 때 메인 화면 표시
                     CameraPreview(
                         modifier = Modifier.fillMaxSize(),
                         onBoxTap = { box ->
@@ -269,11 +281,58 @@ fun MainScreen() {
                         }
                     )
                 }
+                
+                // 바텀바 상태에 따라 노트 목록 표시 (팝업/Overlay 아님)
+                if (showNoteList) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 56.dp) // 바텀바 높이 고려
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Text(
+                            text = "저장된 독서 노트",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 16.dp)
+                        )
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 320.dp) // 적당한 높이 제한(조정 가능)
+                                .padding(bottom = 8.dp),
+                        ) {
+                            items(noteList.value) { note ->
+                                Card(
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                                        .fillMaxWidth()
+                                ) {
+                                    Column(modifier = Modifier.padding(12.dp)) {
+                                        Text(
+                                            "원문: ${note.originalText}",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                        Text(
+                                            "번역: ${note.translatedText}",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                        Text(
+                                            "저장 시각: ${
+                                                java.text.SimpleDateFormat("yy-MM-dd HH:mm")
+                                                    .format(java.util.Date(note.timestamp))
+                                            }",
+                                            style = MaterialTheme.typography.labelSmall, color = Color.Gray
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     )
     
-    // 번역 결과를 보여주는 AlertDialog
     if (showTranslation && selectedBox != null) {
         AlertDialog(
             onDismissRequest = { showTranslation = false },
@@ -287,7 +346,6 @@ fun MainScreen() {
                 }
             },
             confirmButton = {
-                // ✅ '노트 저장' 버튼을 명확하게 배치
                 val canSave = translateState.value is TranslateUiState.Success
                 TextButton(
                     enabled = canSave,
@@ -299,7 +357,6 @@ fun MainScreen() {
                                 timestamp = System.currentTimeMillis()
                             )
                             viewModel.saveNote(note)
-                            // 저장 안내 토스트 (context 필요시 추가)
                             Toast.makeText(context, "노트가 저장되었습니다.", Toast.LENGTH_SHORT).show()
                         }
                         showTranslation = false
@@ -313,51 +370,8 @@ fun MainScreen() {
             }
         )
     }
-    val noteList = viewModel.noteList.collectAsState()
-    
-    LaunchedEffect(Unit) {
-        viewModel.loadAllNotes() // 앱 시작 시 최초 목록 불러오기
-    }
-    
-    Text(
-        text = "저장된 독서 노트",
-        style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier.padding(top = 24.dp, bottom = 8.dp)
-    )
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 24.dp),
-        content = {
-            items(noteList.value) { note ->
-                Card(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
-                        .fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Text(
-                            "원문: ${note.originalText}",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            "번역: ${note.translatedText}",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            "저장 시각: ${
-                                java.text.SimpleDateFormat("yy-MM-dd HH:mm")
-                                    .format(java.util.Date(note.timestamp))
-                            }",
-                            style = MaterialTheme.typography.labelSmall, color = Color.Gray
-                        )
-                    }
-                }
-            }
-        }
-    )
-    
 }
+
 
 
 /**

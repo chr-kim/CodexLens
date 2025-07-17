@@ -1,5 +1,6 @@
 package com.codexlens
 
+import CodexLensViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.codexlens.data.model.ReadingNoteDao
