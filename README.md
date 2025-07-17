@@ -83,7 +83,7 @@ Codex Lens는 카메라로 책/화면을 비추면 실시간으로 텍스트를 
    ```bash
    git clone https://github.com/your-org/codex-lens.git
    ```
-2. **Android Studio(OX 버전 이상)로 열기**
+2. **Android Studio(35 버전 이상)로 열기**
 3. **필수 라이브러리/플러그인 동기화**
 4. **실기기(USB 디버깅) 또는 에뮬레이터 실행**
 5. **필요 권한(카메라, 저장소) 허용**
