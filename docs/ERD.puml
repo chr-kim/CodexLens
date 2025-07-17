@@ -1,25 +1,18 @@
 @startuml
-' ReadingNote 엔터티
+' 실제 동작 코드 기준 ReadingNote 엔터티
 class ReadingNote {
   +id: Long
   +originalText: String
   +translatedText: String
   +timestamp: Long
-  +memo: String
-  +tags: String
 }
 
-' (확장) User, Tag 예시
-class User {
-  +userId: Long
-  +name: String
-}
-class Tag {
-  +tagId: Long
-  +name: String
-}
+' 실제 구현상 User, Tag, memo, tags 필드는 없음 (확장안에선 가능)
+' ReadingNoteDao: 오직 ReadingNote 엔티티를 기반으로 insert/getAll 기능만 존재
 
 ' 관계 예시
-User "1" -- "0..*" ReadingNote : "has"
-ReadingNote "0..*" -- "0..*" Tag : "tagged"
+' 현재 User, Tag 테이블/클래스는 코드에 존재하지 않으므로 미포함
+
+' 추가설명: ReadingNote는 Room 테이블 "reading_notes"에 맵핑됨
+
 @enduml

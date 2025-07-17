@@ -1,37 +1,43 @@
 @startuml
+' ReadingNote - Room 엔티티
 class ReadingNote {
   +id: Long
   +originalText: String
   +translatedText: String
   +timestamp: Long
-  +memo: String
-  +tags: String
 }
 
+' DAO (insert, selectAll만 구현)
 class ReadingNoteDao {
-  +insert(note: ReadingNote)
-  +delete(note: ReadingNote)
-  +getAll(): List<ReadingNote>
+  +insert(note: ReadingNote): Long
+  +getAllNotes(): List<ReadingNote>
 }
 
+' Room DB 추상 클래스
 class AppDatabase {
   +readingNoteDao(): ReadingNoteDao
 }
 
-class MainViewModel {
-  +notes: LiveData<List<ReadingNote>>
-  +addNote()
-  +removeNote()
+' ViewModel (LiveData → StateFlow, 함수 네이밍까지 MVVM 표준에 맞춤)
+class CodexLensViewModel {
+  +noteList: StateFlow<List<ReadingNote>>
+  +loadAllNotes()
+  +saveNote(note: ReadingNote)
+  +translateState: StateFlow<TranslateUiState>
+  +onBoxSelected(box: TextBox)
 }
 
+' MainScreen(= Jetpack Compose 메인 UI 컴포저블)
 class MainScreen {
   +카메라 프리뷰
-  +노트 목록
-  +저장 UI
+  +번역 결과 팝업(AlertDialog)
+  +노트 저장 버튼
+  +노트 목록(LazyColumn)
 }
 
 ReadingNoteDao --> ReadingNote : manages
 AppDatabase --> ReadingNoteDao : provides
-MainViewModel --> AppDatabase : uses
-MainScreen --> MainViewModel : observes
+CodexLensViewModel --> AppDatabase : uses
+MainScreen --> CodexLensViewModel : observes/data binding
+
 @enduml

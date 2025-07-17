@@ -1,0 +1,31 @@
+@startuml
+title Codex Lens - 번역 및 노트 저장 핵심 액티비티 다이어그램
+
+start
+:앱 실행(MainScreen 진입);
+:카메라 프리뷰 시작;
+:텍스트 인식 및 후보 박스 표시;
+
+:사용자가 텍스트 박스 클릭;
+:번역 요청 → 로딩 표시;
+if (번역 성공?) then (예)
+    :번역 결과 AlertDialog(팝업) 표시;
+    if ('노트 저장' 버튼 클릭?) then (예)
+        :노트 객체 생성(originalText, translatedText);
+        :RoomDB 저장 요청;
+        if (저장 성공?) then (예)
+            :"노트 저장 성공" 메시지(Toast 등) 표시;
+            :노트 목록 최신화;
+        else (아니오)
+            :"저장 실패" 알림(에러 안내);
+        endif
+    endif
+    :AlertDialog 닫기;
+else (아니오)
+    :에러 메시지 AlertDialog 표시;
+    :AlertDialog 닫기;
+endif
+
+:화면 상단 LazyColumn에 저장된 노트 목록 표시;
+stop
+@enduml
